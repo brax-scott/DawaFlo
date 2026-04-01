@@ -1,91 +1,210 @@
-<div class="overflow-x-auto max-h-[400px]">
-    <table class="w-full text-left">
-        <thead class="bg-slate-800 text-white sticky top-0">
-            <tr>
-                <th class="p-4 text-xs font-black uppercase tracking-wider">Dawa</th>
-                <th class="p-4 text-xs font-black uppercase tracking-wider text-right">Bei</th>
-                <th class="p-4 text-xs font-black uppercase tracking-wider text-center">Expiry</th>
-                <th class="p-4 text-center">Action</th>
-            </tr>
-        </thead>
-        <tbody id="inventoryBody" class="divide-y divide-slate-100"></tbody>
-    </table>
-</div>
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DawaFlo Pro | Cloud Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
 
-<script>
-    const FIREBASE_URL = "https://dawaflo-a3926-default-rtdb.firebaseio.com/mauzo";
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-slate-900 rounded-3xl p-6 mb-8 shadow-2xl flex justify-between items-center border-b-4 border-emerald-500">
+            <div>
+                <h1 class="text-3xl font-black text-white tracking-tighter uppercase">DAWA<span class="text-emerald-400">FLO</span></h1>
+                <p class="text-emerald-100 text-xs font-bold tracking-widest opacity-70">SUPREME CLOUD SYSTEM</p>
+            </div>
+            <div class="bg-emerald-500/20 p-4 rounded-2xl border border-emerald-500/40">
+                <i class="fas fa-file-invoice text-emerald-400 text-2xl"></i>
+            </div>
+        </div>
 
-    // --- KAZI YA KUTENGENEZA RISITI ---
-    function printReceipt(item) {
-        const receiptWindow = window.open('', '_blank', 'width=300,height=450');
-        receiptWindow.document.write(`
-            <html>
-                <head>
-                    <title>DawaFlo Receipt</title>
-                    <style>
-                        body { font-family: 'Courier New', Courier, monospace; padding: 20px; text-align: center; }
-                        .line { border-bottom: 1px dashed #000; margin: 10px 0; }
-                        .header { font-weight: bold; font-size: 18px; }
-                        .details { text-align: left; font-size: 14px; margin-top: 15px; }
-                        .footer { margin-top: 20px; font-size: 12px; font-style: italic; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">DAWAFLO PHARMACY</div>
-                    <div class="line"></div>
-                    <div class="details">
-                        <b>TAREHE:</b> ${new Date().toLocaleDateString()}<br>
-                        <b>Muda:</b> ${new Date().toLocaleTimeString()}<br><br>
-                        <b>DAWA:</b> ${item.dawa}<br>
-                        <b>BEI:</b> TSH ${parseInt(item.bei).toLocaleString()}/=<br>
-                        <b>EXPIRY:</b> ${item.expiry || 'S/A'}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-4">
+                <div class="glass-card p-6 rounded-3xl shadow-xl border border-white">
+                    <h2 class="text-slate-800 font-black mb-6 flex items-center">
+                        <i class="fas fa-plus-circle text-emerald-500 mr-2"></i> REKODI MAUZO
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Jina la Dawa</label>
+                            <input type="text" id="dawa" placeholder="Mf: Panadol" class="w-full p-4 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold text-slate-700">
+                        </div>
+                        
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Bei (Tsh)</label>
+                            <input type="number" id="bei" placeholder="500" class="w-full p-4 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-mono font-black text-emerald-600">
+                        </div>
+                        
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-2">Expiry Date</label>
+                            <input type="date" id="expiry" class="w-full p-4 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none">
+                        </div>
+
+                        <button id="saveBtn" onclick="ongezaDawa()" class="w-full bg-slate-900 hover:bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-lg transform active:scale-95 transition-all duration-200 mt-4 uppercase tracking-widest">
+                            Hifadhi Cloud
+                        </button>
                     </div>
-                    <div class="line"></div>
-                    <div class="footer">Asante kwa kuthamini afya yako.<br>KARIBU TENA!</div>
-                    <script>window.print(); window.close();<\/script>
-                </body>
-            </html>
-        `);
-        receiptWindow.document.close();
-    }
+                </div>
+            </div>
 
-    // --- KAZI YA KUONYESHA DATA NA VITUFE ---
-    async function onyeshaData() {
-        const body = document.getElementById('inventoryBody');
-        try {
+            <div class="lg:col-span-8">
+                <div class="glass-card rounded-3xl shadow-xl border border-white overflow-hidden">
+                    <div class="p-6 bg-white flex justify-between items-center border-b border-slate-100">
+                        <h2 class="text-slate-800 font-black uppercase tracking-tight">Orodha ya Mauzo</h2>
+                        <span id="counter" class="bg-emerald-100 text-emerald-700 text-xs font-black px-3 py-1 rounded-full">0 REKODI</span>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 text-slate-400">
+                                <tr>
+                                    <th class="p-4 text-[10px] font-black uppercase">Dawa</th>
+                                    <th class="p-4 text-[10px] font-black uppercase text-right">Bei</th>
+                                    <th class="p-4 text-[10px] font-black uppercase text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryBody" class="divide-y divide-slate-50">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="p-6 bg-slate-900 text-white flex justify-between items-center">
+                        <span class="text-xs font-bold opacity-60 uppercase">Jumla Kuu (Tsh):</span>
+                        <span id="totalRevenue" class="text-2xl font-black text-emerald-400 font-mono">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // KIUNGO CHA FIREBASE (Link yako uliyopata)
+        const FIREBASE_URL = "https://dawaflo-a3926-default-rtdb.firebaseio.com/mauzo";
+
+        // 1. Kazi ya Kuhifadhi
+        async function ongezaDawa() {
+            const dawa = document.getElementById('dawa').value;
+            const bei = document.getElementById('bei').value;
+            const expiry = document.getElementById('expiry').value;
+            const btn = document.getElementById('saveBtn');
+
+            if(!dawa || !bei) {
+                alert("Tafadhali jaza Jina na Bei!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i>';
+
+            try {
+                const response = await fetch(`${FIREBASE_URL}.json`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        dawa: dawa,
+                        bei: parseInt(bei),
+                        expiry: expiry,
+                        muda: new Date().toLocaleString()
+                    })
+                });
+
+                if(response.ok) {
+                    document.getElementById('dawa').value = '';
+                    document.getElementById('bei').value = '';
+                    onyeshaData();
+                }
+            } catch (error) {
+                alert("Hitilafu ya Mtandao!");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Hifadhi Cloud";
+            }
+        }
+
+        // 2. Kazi ya Kufuta
+        async function futaRekodi(id) {
+            if(confirm("Je, una uhakika unataka kufuta hii rekodi?")) {
+                await fetch(`${FIREBASE_URL}/${id}.json`, { method: 'DELETE' });
+                onyeshaData();
+            }
+        }
+
+        // 3. Kazi ya Kutoa Risiti
+        function printReceipt(item) {
+            const win = window.open('', '_blank', 'width=300,height=450');
+            win.document.write(`
+                <html>
+                    <body style="font-family:monospace; padding:20px; text-align:center; color:#333;">
+                        <h2 style="margin-bottom:0;">DAWAFLO</h2>
+                        <small>CLOUD PHARMACY</small>
+                        <hr style="border:1px dashed #ccc; margin:15px 0;">
+                        <div style="text-align:left; font-size:14px;">
+                            <b>TAREHE:</b> ${new Date().toLocaleDateString()}<br>
+                            <b>MUDA:</b> ${new Date().toLocaleTimeString()}<br>
+                            <br>
+                            <b>DAWA:</b> ${item.dawa.toUpperCase()}<br>
+                            <b>BEI:</b> TSH ${item.bei.toLocaleString()}/=<br>
+                        </div>
+                        <hr style="border:1px dashed #ccc; margin:15px 0;">
+                        <p style="font-size:12px;">ASANTE KWA KUFIKA!<br>KARIBU TENA.</p>
+                        <script>window.print(); window.close();<\/script>
+                    </body>
+                </html>
+            `);
+            win.document.close();
+        }
+
+        // 4. Kazi ya Kuvuta Data kutoka Firebase
+        async function onyeshaData() {
+            const body = document.getElementById('inventoryBody');
             const res = await fetch(`${FIREBASE_URL}.json`);
             const items = await res.json();
+            
             body.innerHTML = '';
-            let totalRev = 0;
+            let total = 0;
             let count = 0;
 
             if(items) {
                 Object.keys(items).reverse().forEach(key => {
                     const item = items[key];
-                    totalRev += item.bei;
+                    total += item.bei;
                     count++;
+
                     body.innerHTML += `
-                        <tr class="hover:bg-emerald-50 border-b">
-                            <td class="p-4 font-bold text-slate-700">${item.dawa}</td>
-                            <td class="p-4 text-right font-mono text-emerald-600 font-black">${item.bei.toLocaleString()}</td>
-                            <td class="p-4 text-center text-xs text-red-500 font-bold">${item.expiry || '-'}</td>
+                        <tr class="hover:bg-slate-50 transition-all border-b border-slate-50">
+                            <td class="p-4">
+                                <div class="font-bold text-slate-800 text-sm">${item.dawa}</div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">${item.expiry || 'S/A'}</div>
+                            </td>
+                            <td class="p-4 text-right font-mono font-black text-emerald-600">
+                                ${item.bei.toLocaleString()}
+                            </td>
                             <td class="p-4 text-center space-x-2">
-                                <button onclick='printReceipt(${JSON.stringify(item)})' class="text-blue-500 hover:text-blue-700" title="Risiti">
-                                    <i class="fas fa-print"></i>
+                                <button onclick='printReceipt(${JSON.stringify(item)})' class="bg-blue-50 text-blue-500 w-8 h-8 rounded-lg hover:bg-blue-500 hover:text-white transition-all">
+                                    <i class="fas fa-print text-xs"></i>
                                 </button>
-                                <button onclick="futaRekodi('${key}')" class="text-slate-300 hover:text-red-500">
-                                    <i class="fas fa-trash"></i>
+                                <button onclick="futaRekodi('${key}')" class="bg-red-50 text-red-400 w-8 h-8 rounded-lg hover:bg-red-500 hover:text-white transition-all">
+                                    <i class="fas fa-trash text-xs"></i>
                                 </button>
                             </td>
                         </tr>
                     `;
                 });
             }
-            document.getElementById('totalItems').innerText = count;
-            document.getElementById('totalRevenue').innerText = totalRev.toLocaleString();
-        } catch (e) { console.error(e); }
-    }
+            document.getElementById('totalRevenue').innerText = total.toLocaleString();
+            document.getElementById('counter').innerText = count + " REKODI";
+        }
 
-    // (Hapa ongeza zile function zingine za ongezaDawa na futaRekodi kama tulivyofanya mwanzo)
-    window.onload = onyeshaData;
-</script>
+        // Pakia data App ikifunguka
+        window.onload = onyeshaData;
+    </script>
+</body>
+</html>
